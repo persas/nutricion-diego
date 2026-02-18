@@ -1,15 +1,18 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, Camera, Apple, ChefHat, CalendarDays,
-  UtensilsCrossed, Pill, FlaskConical, Target
+  UtensilsCrossed, Pill, FlaskConical, Target, Lock, ShieldCheck, Loader2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Input } from '@/components/ui/input';
+import { useAdmin } from '@/components/providers/AdminProvider';
 
 const mainNav = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -28,6 +31,31 @@ const secondaryNav = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { isAdmin, isLoading: adminLoading, login, logout } = useAdmin();
+  const [showLogin, setShowLogin] = useState(false);
+  const [password, setPassword] = useState('');
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [loginError, setLoginError] = useState(false);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!password.trim()) return;
+    setLoginLoading(true);
+    setLoginError(false);
+    const success = await login(password);
+    if (success) {
+      setShowLogin(false);
+      setPassword('');
+    } else {
+      setLoginError(true);
+    }
+    setLoginLoading(false);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    setShowLogin(false);
+  };
 
   const isActive = (href: string) =>
     href === '/' ? pathname === '/' : pathname.startsWith(href);
@@ -115,7 +143,7 @@ export default function Sidebar() {
       </ScrollArea>
 
       {/* Footer */}
-      <div className="px-4 py-3 border-t border-border">
+      <div className="px-4 py-3 border-t border-border space-y-2">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-full bg-[#00b894]/20 flex items-center justify-center text-xs font-bold text-[#00b894]">
             D
@@ -124,7 +152,42 @@ export default function Sidebar() {
             <p className="text-xs font-medium text-foreground truncate">Diego</p>
             <p className="text-[10px] text-muted-foreground">Protocolo Psoriasis</p>
           </div>
+          {!adminLoading && (
+            <button
+              onClick={() => isAdmin ? handleLogout() : setShowLogin(!showLogin)}
+              className={cn(
+                'p-1.5 rounded-lg transition-colors',
+                isAdmin
+                  ? 'text-[#00b894] hover:bg-[#00b894]/15'
+                  : 'text-muted-foreground hover:bg-muted'
+              )}
+              title={isAdmin ? 'Admin activo — click para cerrar sesion' : 'Login admin'}
+            >
+              {isAdmin ? <ShieldCheck className="size-4" /> : <Lock className="size-4" />}
+            </button>
+          )}
         </div>
+
+        {/* Inline login form */}
+        {showLogin && !isAdmin && (
+          <form onSubmit={handleLogin} className="space-y-1.5">
+            <Input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => { setPassword(e.target.value); setLoginError(false); }}
+              disabled={loginLoading}
+              className="h-7 text-xs"
+              autoFocus
+            />
+            {loginError && (
+              <p className="text-destructive text-[10px]">Password incorrecto</p>
+            )}
+            <Button type="submit" size="sm" className="w-full h-7 text-xs" disabled={loginLoading || !password.trim()}>
+              {loginLoading ? <Loader2 className="size-3 animate-spin" /> : 'Entrar'}
+            </Button>
+          </form>
+        )}
       </div>
     </aside>
   );

@@ -3,6 +3,7 @@ import "./globals.css";
 import Sidebar from "@/components/layout/Sidebar";
 import MobileNav from "@/components/layout/MobileNav";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AdminProvider } from "@/components/providers/AdminProvider";
 
 export const metadata: Metadata = {
   title: "NutriTrack — Plan Anti-inflamatorio",
@@ -17,15 +18,17 @@ export default function RootLayout({
   return (
     <html lang="es" className="dark">
       <body>
-        <TooltipProvider>
-          <div className="flex h-screen overflow-hidden">
-            <Sidebar />
-            <main className="flex-1 overflow-y-auto pb-20 md:pb-0">
-              {children}
-            </main>
-          </div>
-          <MobileNav />
-        </TooltipProvider>
+        <AdminProvider>
+          <TooltipProvider>
+            <div className="flex h-screen overflow-hidden">
+              <Sidebar />
+              <main className="flex-1 overflow-y-auto pb-20 md:pb-0">
+                {children}
+              </main>
+            </div>
+            <MobileNav />
+          </TooltipProvider>
+        </AdminProvider>
       </body>
     </html>
   );

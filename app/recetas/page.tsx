@@ -9,6 +9,7 @@ import RecipeCard from '@/components/recipes/RecipeCard';
 import RecipeFilters from '@/components/recipes/RecipeFilters';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useAdmin } from '@/components/providers/AdminProvider';
 
 export default function RecetasPage() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -17,6 +18,7 @@ export default function RecetasPage() {
   const [error, setError] = useState<string | null>(null);
   const [activeTags, setActiveTags] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const { isAdmin } = useAdmin();
 
   useEffect(() => {
     const loadRecipes = async () => {
@@ -77,20 +79,22 @@ export default function RecetasPage() {
               </p>
             </div>
           </div>
-          <div className="flex gap-3">
-            <Link href="/recetas/nueva-ai">
-              <Button size="lg" className="bg-[#6c5ce7] hover:bg-[#5b4bd6] text-white">
-                <Sparkles className="size-4" />
-                Generar con AI
-              </Button>
-            </Link>
-            <Link href="/recetas/nueva">
-              <Button size="lg" className="bg-[#00b894] hover:bg-[#00a382] text-white">
-                <Plus className="size-4" />
-                Nueva Receta
-              </Button>
-            </Link>
-          </div>
+          {isAdmin && (
+            <div className="flex gap-3">
+              <Link href="/recetas/nueva-ai">
+                <Button size="lg" className="bg-[#6c5ce7] hover:bg-[#5b4bd6] text-white">
+                  <Sparkles className="size-4" />
+                  Generar con AI
+                </Button>
+              </Link>
+              <Link href="/recetas/nueva">
+                <Button size="lg" className="bg-[#00b894] hover:bg-[#00a382] text-white">
+                  <Plus className="size-4" />
+                  Nueva Receta
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
       </section>
 
@@ -121,11 +125,13 @@ export default function RecetasPage() {
                   ? 'No hay recetas disponibles aun.'
                   : 'No se encontraron recetas que coincidan con tu busqueda.'}
               </p>
-              <Link href="/recetas/nueva">
-                <Button className="bg-[#6c5ce7] hover:bg-[#5f4ccf] text-white">
-                  Crear primera receta
-                </Button>
-              </Link>
+              {isAdmin && (
+                <Link href="/recetas/nueva">
+                  <Button className="bg-[#6c5ce7] hover:bg-[#5f4ccf] text-white">
+                    Crear primera receta
+                  </Button>
+                </Link>
+              )}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">

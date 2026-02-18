@@ -12,6 +12,10 @@ function parseRecipe(raw: Record<string, unknown>): Recipe {
   } as Recipe;
 }
 
+// ==========================================
+// READ operations (public, direct Supabase)
+// ==========================================
+
 export async function getRecipes(filters?: {
   tags?: string[];
   warning_level?: string;
@@ -75,39 +79,27 @@ export async function getRecipeById(id: string): Promise<Recipe | null> {
   }
 }
 
+// ==========================================
+// WRITE operations (admin-only, via API routes)
+// ==========================================
+
 export async function addRecipe(
   recipe: Omit<Recipe, 'id' | 'created_at'>
 ): Promise<Recipe | null> {
-  if (!supabase) {
-    console.warn('Supabase not configured.');
-    return null;
-  }
-
   try {
-    // Generate a unique ID (table uses TEXT PRIMARY KEY, not auto-generated)
-    const id = `custom_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const res = await fetch('/api/recipes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(recipe),
+    });
 
-    // Serialize arrays to JSON strings for TEXT columns
-    const payload = {
-      id,
-      ...recipe,
-      tags: JSON.stringify(recipe.tags),
-      ingredients: JSON.stringify(recipe.ingredients),
-      preparation: recipe.preparation ? JSON.stringify(recipe.preparation) : null,
-    };
-
-    const { data, error } = await supabase
-      .from('recipes')
-      .insert([payload])
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error adding recipe:', error);
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      console.error('Error adding recipe:', data.error || res.statusText);
       return null;
     }
 
-    return data ? parseRecipe(data as Record<string, unknown>) : null;
+    return await res.json();
   } catch (error) {
     console.error('Error in addRecipe:', error);
     return null;
@@ -118,28 +110,20 @@ export async function updateRecipe(
   id: string,
   updates: Partial<Recipe>
 ): Promise<Recipe | null> {
-  if (!supabase) return null;
-
   try {
-    // Serialize arrays to JSON strings for TEXT columns
-    const payload: Record<string, unknown> = { ...updates };
-    if (updates.tags) payload.tags = JSON.stringify(updates.tags);
-    if (updates.ingredients) payload.ingredients = JSON.stringify(updates.ingredients);
-    if (updates.preparation) payload.preparation = JSON.stringify(updates.preparation);
+    const res = await fetch(`/api/recipes/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updates),
+    });
 
-    const { data, error } = await supabase
-      .from('recipes')
-      .update(payload)
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error updating recipe:', error);
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      console.error('Error updating recipe:', data.error || res.statusText);
       return null;
     }
 
-    return data ? parseRecipe(data as Record<string, unknown>) : null;
+    return await res.json();
   } catch (error) {
     console.error('Error in updateRecipe:', error);
     return null;
@@ -147,19 +131,12 @@ export async function updateRecipe(
 }
 
 export async function deleteRecipe(id: string): Promise<boolean> {
-  if (!supabase) return false;
-
   try {
-    const recipe = await getRecipeById(id);
-    if (!recipe?.is_custom) {
-      console.error('Can only delete custom recipes');
-      return false;
-    }
+    const res = await fetch(`/api/recipes/${id}`, { method: 'DELETE' });
 
-    const { error } = await supabase.from('recipes').delete().eq('id', id);
-
-    if (error) {
-      console.error('Error deleting recipe:', error);
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      console.error('Error deleting recipe:', data.error || res.statusText);
       return false;
     }
 

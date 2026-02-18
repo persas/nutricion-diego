@@ -13,6 +13,8 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import TierBadge from '@/components/ui/TierBadge';
 import { cn } from '@/lib/utils';
+import { useAdmin } from '@/components/providers/AdminProvider';
+import AdminRequired from '@/components/admin/AdminRequired';
 
 interface GeneratedRecipe {
   name: string;
@@ -30,6 +32,30 @@ interface GeneratedRecipe {
 }
 
 export default function NuevaRecetaAIPage() {
+  const { isAdmin, isLoading: adminLoading } = useAdmin();
+
+  if (adminLoading) {
+    return (
+      <main className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Cargando...</p>
+      </main>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <AdminRequired
+        message="Solo el administrador puede generar recetas con AI."
+        backHref="/recetas"
+        backLabel="Volver a recetas"
+      />
+    );
+  }
+
+  return <NuevaRecetaAIForm />;
+}
+
+function NuevaRecetaAIForm() {
   const router = useRouter();
   const [recipeName, setRecipeName] = useState('');
   const [loading, setLoading] = useState(false);

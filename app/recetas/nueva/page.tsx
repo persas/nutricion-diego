@@ -10,12 +10,38 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { useAdmin } from '@/components/providers/AdminProvider';
+import AdminRequired from '@/components/admin/AdminRequired';
 
 const AVAILABLE_TAGS = ['breakfast', 'lunch', 'dinner', 'snack', 'anti-inflam', 'omega-3', 'gut', 'quick', 'high-protein', 'low-carb', 'batch-cook'];
 const WARNING_LEVELS = ['none', 'caution', 'avoid'] as const;
 const TIERS: FoodTier[] = ['excelente', 'bueno', 'neutro', 'precaucion', 'evitar'];
 
 export default function NuevaRecetaPage() {
+  const { isAdmin, isLoading: adminLoading } = useAdmin();
+
+  if (adminLoading) {
+    return (
+      <main className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Cargando...</p>
+      </main>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <AdminRequired
+        message="Solo el administrador puede crear recetas manualmente."
+        backHref="/recetas"
+        backLabel="Volver a recetas"
+      />
+    );
+  }
+
+  return <NuevaRecetaForm />;
+}
+
+function NuevaRecetaForm() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

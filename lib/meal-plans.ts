@@ -1,6 +1,10 @@
 import { supabase } from './supabase';
 import { MealPlan } from '@/types';
 
+// ==========================================
+// READ operations (public, direct Supabase)
+// ==========================================
+
 export async function getMealPlans(): Promise<MealPlan[]> {
   if (!supabase) return [];
 
@@ -22,32 +26,29 @@ export async function getMealPlans(): Promise<MealPlan[]> {
   }
 }
 
+// ==========================================
+// WRITE operations (admin-only, via API routes)
+// ==========================================
+
 export async function saveMealPlan(
   name: string,
   selectedIds: string[],
   notes?: string
 ): Promise<MealPlan | null> {
-  if (!supabase) return null;
-
   try {
-    const { data, error } = await supabase
-      .from('meal_plans')
-      .insert([
-        {
-          name,
-          selected_ids: selectedIds,
-          notes: notes || null,
-        },
-      ])
-      .select()
-      .single();
+    const res = await fetch('/api/meal-plans', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, selectedIds, notes }),
+    });
 
-    if (error) {
-      console.error('Error saving meal plan:', error);
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      console.error('Error saving meal plan:', data.error || res.statusText);
       return null;
     }
 
-    return data || null;
+    return await res.json();
   } catch (error) {
     console.error('Error in saveMealPlan:', error);
     return null;
@@ -55,13 +56,12 @@ export async function saveMealPlan(
 }
 
 export async function deleteMealPlan(id: string): Promise<boolean> {
-  if (!supabase) return false;
-
   try {
-    const { error } = await supabase.from('meal_plans').delete().eq('id', id);
+    const res = await fetch(`/api/meal-plans/${id}`, { method: 'DELETE' });
 
-    if (error) {
-      console.error('Error deleting meal plan:', error);
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      console.error('Error deleting meal plan:', data.error || res.statusText);
       return false;
     }
 
