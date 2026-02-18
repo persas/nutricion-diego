@@ -29,7 +29,7 @@ export interface MealPlan {
   created_at: string;
 }
 
-export type RecipeTag = 'snack' | 'anti-inflam' | 'omega-3' | 'gut' | 'quick';
+export type RecipeTag = 'lunch' | 'dinner' | 'breakfast' | 'snack' | 'anti-inflam' | 'omega-3' | 'gut' | 'quick' | 'high-protein' | 'low-carb' | 'batch-cook';
 export type WarningLevel = 'none' | 'caution' | 'avoid';
 
 // Food tier system
@@ -69,22 +69,30 @@ export const TIER_CONFIG: Record<FoodTier, { label: string; color: string; bgCol
 export const TAG_LABELS: Record<string, string> = {
   'lunch': 'Almuerzo',
   'dinner': 'Cena',
+  'breakfast': 'Desayuno',
   'snack': 'Merienda',
   'anti-inflam': 'Anti-inflam.',
   'omega-3': 'Omega-3',
   'gut': 'Salud intestinal',
   'quick': 'Rapido',
+  'high-protein': 'Alta proteina',
+  'low-carb': 'Low carb',
+  'batch-cook': 'Batch cook',
   'caution': 'Precaucion',
 };
 
 export const TAG_COLORS: Record<string, string> = {
   'lunch': 'bg-blue-500/15 text-blue-400 border-blue-500/30',
   'dinner': 'bg-indigo-500/15 text-indigo-400 border-indigo-500/30',
+  'breakfast': 'bg-orange-500/15 text-orange-400 border-orange-500/30',
   'snack': 'bg-yellow-500/15 text-yellow-400 border-yellow-500/30',
   'anti-inflam': 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
   'omega-3': 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30',
   'gut': 'bg-violet-500/15 text-violet-400 border-violet-500/30',
   'quick': 'bg-amber-500/15 text-amber-400 border-amber-500/30',
+  'high-protein': 'bg-rose-500/15 text-rose-400 border-rose-500/30',
+  'low-carb': 'bg-teal-500/15 text-teal-400 border-teal-500/30',
+  'batch-cook': 'bg-sky-500/15 text-sky-400 border-sky-500/30',
 };
 
 export const CATEGORY_ICONS: Record<string, string> = {
