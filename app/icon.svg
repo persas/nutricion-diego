@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Background circle -->
+  <circle cx="32" cy="32" r="30" fill="#0a0a12" stroke="#6c5ce7" stroke-width="2.5"/>
+  <!-- Leaf / anti-inflammatory symbol -->
+  <path d="M32 12 C18 18, 12 30, 16 44 C20 38, 26 32, 32 28 C38 32, 44 38, 48 44 C52 30, 46 18, 32 12Z" fill="#00b894" opacity="0.9"/>
+  <!-- Leaf center vein -->
+  <path d="M32 14 L32 42" stroke="#0a0a12" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+  <!-- Small side veins -->
+  <path d="M32 22 L24 28" stroke="#0a0a12" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+  <path d="M32 22 L40 28" stroke="#0a0a12" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+  <path d="M32 30 L22 36" stroke="#0a0a12" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+  <path d="M32 30 L42 36" stroke="#0a0a12" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+  <!-- Small plus/cross for health -->
+  <rect x="28" y="48" width="8" height="3" rx="1.5" fill="#6c5ce7"/>
+  <rect x="30.5" y="45.5" width="3" height="8" rx="1.5" fill="#6c5ce7"/>
+</svg>
