@@ -6,7 +6,7 @@ import { Recipe, TAG_LABELS } from '@/types';
 import { addRecipe } from '@/lib/recipes';
 import IngredientBuilder from '@/components/recipes/IngredientBuilder';
 
-const AVAILABLE_TAGS = ['lunch', 'dinner', 'snack', 'anti-inflam', 'omega-3', 'gut', 'quick'];
+const AVAILABLE_TAGS = ['snack', 'anti-inflam', 'omega-3', 'gut', 'quick'];
 const WARNING_LEVELS = ['none', 'caution', 'avoid'] as const;
 
 export default function NuevaRecetaPage() {

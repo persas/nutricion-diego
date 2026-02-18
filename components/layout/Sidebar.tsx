@@ -6,6 +6,7 @@ import { useState } from 'react';
 
 const navItems = [
   { href: '/', label: 'Dashboard', icon: '📊' },
+  { href: '/scanner', label: 'Scanner', icon: '📸' },
   { href: '/alimentos', label: 'Alimentos', icon: '🥗' },
   { href: '/planificador', label: 'Planificador', icon: '📋' },
   { href: '/recetas', label: 'Recetas', icon: '👨‍🍳' },
@@ -52,34 +53,35 @@ export default function Sidebar() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed md:relative top-0 left-0 h-screen w-60 bg-[#12121a] border-r border-[#1a1a2e] z-40 transition-transform md:translate-x-0 ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed md:relative top-0 left-0 h-screen w-60 bg-[#12121a] border-r border-[#1a1a2e] z-40 transition-transform hidden md:block ${
+          isOpen ? 'translate-x-0 !block' : '-translate-x-full'
         } md:translate-x-0`}
       >
         <div className="p-6 flex flex-col h-full">
           {/* Logo */}
           <div className="mb-8">
             <h1 className="text-2xl font-bold">
-              <span className="text-white">Nutrición</span>
+              <span className="text-white">Nutricion</span>
               <span className="text-[#00b894]">.</span>
             </h1>
+            <p className="text-xs text-gray-500 mt-1">Anti-inflamatorio</p>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 space-y-2">
+          <nav className="flex-1 space-y-1">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setIsOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all ${
                   isActive(item.href)
                     ? 'bg-[#6c5ce7] text-white'
                     : 'text-gray-400 hover:text-white hover:bg-[#1a1a2e]'
                 }`}
               >
                 <span className="text-lg">{item.icon}</span>
-                <span className="font-medium">{item.label}</span>
+                <span className="font-medium text-sm">{item.label}</span>
               </Link>
             ))}
           </nav>

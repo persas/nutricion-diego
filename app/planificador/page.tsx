@@ -60,6 +60,10 @@ export default function PlanificadorPage() {
     if (newSelected.has(recipeId)) {
       newSelected.delete(recipeId);
     } else {
+      // Limit selection to 10 recipes
+      if (newSelected.size >= 10) {
+        return;
+      }
       newSelected.add(recipeId);
     }
     setSelectedIds(newSelected);
@@ -83,7 +87,7 @@ export default function PlanificadorPage() {
       <div>
         <h1 className="text-3xl font-bold text-white mb-2">Planificador Semanal</h1>
         <p className="text-gray-400">
-          Selecciona recetas para generar tu lista de la compra personalizada
+          Selecciona hasta 10 platos para generar tu lista de la compra personalizada
         </p>
       </div>
 
@@ -102,10 +106,17 @@ export default function PlanificadorPage() {
 
       {/* Results count */}
       {!loading && (
-        <p className="text-sm text-gray-500">
-          {filteredRecipes.length} recetas encontradas
-          {selectedIds.size > 0 && ` · ${selectedIds.size} seleccionadas`}
-        </p>
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-gray-500">
+            {filteredRecipes.length} recetas encontradas
+            {selectedIds.size > 0 && ` · ${selectedIds.size} seleccionadas`}
+          </p>
+          {selectedIds.size >= 10 && (
+            <p className="text-sm text-yellow-400 font-medium">
+              Límite alcanzado (10/10)
+            </p>
+          )}
+        </div>
       )}
 
       {/* Loading state */}
@@ -126,15 +137,21 @@ export default function PlanificadorPage() {
       {/* Recipe grid */}
       {!loading && filteredRecipes.length > 0 && (
         <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ${selectedRecipes.length > 0 ? 'pb-64' : ''}`}>
-          {filteredRecipes.map(recipe => (
-            <RecipeCard
-              key={recipe.id}
-              recipe={recipe}
-              selectable={true}
-              selected={selectedIds.has(recipe.id)}
-              onClick={() => toggleRecipeSelection(recipe.id)}
-            />
-          ))}
+          {filteredRecipes.map(recipe => {
+            const isSelected = selectedIds.has(recipe.id);
+            const isDisabled = selectedIds.size >= 10 && !isSelected;
+
+            return (
+              <RecipeCard
+                key={recipe.id}
+                recipe={recipe}
+                selectable={true}
+                selected={isSelected}
+                disabled={isDisabled}
+                onClick={() => toggleRecipeSelection(recipe.id)}
+              />
+            );
+          })}
         </div>
       )}
 

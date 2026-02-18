@@ -1,19 +1,24 @@
 'use client';
 
+import Link from 'next/link';
 import { Recipe, TAG_LABELS, TAG_COLORS } from '@/types';
 
 interface RecipeCardProps {
   recipe: Recipe;
   onClick?: () => void;
+  href?: string;
   selected?: boolean;
   selectable?: boolean;
+  disabled?: boolean;
 }
 
 export default function RecipeCard({
   recipe,
   onClick,
+  href,
   selected = false,
   selectable = false,
+  disabled = false,
 }: RecipeCardProps) {
   const truncatedDescription =
     recipe.description.length > 80
@@ -28,14 +33,16 @@ export default function RecipeCard({
 
   const borderClass = selected
     ? 'border-2 border-[#00b894] shadow-lg shadow-[#00b894]/20'
-    : selectable
-      ? 'border-2 border-[#2a2a3e] hover:border-[#6c5ce7] transition-colors'
-      : 'border border-[#2a2a3e]';
+    : disabled
+      ? 'border-2 border-[#2a2a3e] opacity-50'
+      : selectable
+        ? 'border-2 border-[#2a2a3e] hover:border-[#6c5ce7] transition-colors'
+        : 'border border-[#2a2a3e] hover:border-[#6c5ce7]/50 transition-colors';
 
-  return (
+  const content = (
     <div
-      onClick={onClick}
-      className={`bg-[#12121a] rounded-lg p-6 cursor-pointer transition-all ${borderClass} ${selectable ? 'hover:shadow-lg hover:shadow-[#6c5ce7]/10' : ''}`}
+      onClick={disabled ? undefined : onClick}
+      className={`bg-[#12121a] rounded-lg p-6 transition-all ${borderClass} ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'} ${selectable && !disabled ? 'hover:shadow-lg hover:shadow-[#6c5ce7]/10' : ''}`}
     >
       {/* Header with title and warning indicator */}
       <div className="flex items-start justify-between mb-3">
@@ -94,4 +101,11 @@ export default function RecipeCard({
       )}
     </div>
   );
+
+  // Wrap in Link when href is provided and not in selectable mode
+  if (href && !selectable) {
+    return <Link href={href}>{content}</Link>;
+  }
+
+  return content;
 }
