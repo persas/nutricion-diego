@@ -17,6 +17,8 @@ export interface Recipe {
   warning_level: 'none' | 'caution' | 'avoid';
   warning_reason: string | null;
   ingredients: Ingredient[];
+  preparation: string[] | null;
+  tier: FoodTier;
   is_custom: boolean;
   created_at: string;
 }

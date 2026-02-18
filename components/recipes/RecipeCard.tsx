@@ -1,10 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { Recipe, TAG_LABELS, TAG_COLORS } from '@/types';
+import { Recipe, TAG_LABELS, TAG_COLORS, FoodTier } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import TierBadge from '@/components/ui/TierBadge';
 import { cn } from '@/lib/utils';
 
 interface RecipeCardProps {
@@ -55,6 +56,7 @@ export default function RecipeCard({
         {/* Header with title and warning indicator */}
         <div className="flex items-start justify-between">
           <CardTitle className="text-lg flex-1 pr-2">{recipe.name}</CardTitle>
+          {recipe.tier && <TierBadge tier={recipe.tier as FoodTier} size="sm" />}
           {recipe.warning_level !== 'none' && (
             <div
               className="size-3 rounded-full flex-shrink-0 mt-1"

@@ -3,13 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, CalendarPlus, BookOpen } from 'lucide-react';
-import { Recipe, TAG_LABELS, TAG_COLORS, CATEGORY_ICONS, CATEGORY_ORDER } from '@/types';
+import { ArrowLeft, CalendarPlus, BookOpen, ChefHat } from 'lucide-react';
+import { Recipe, TAG_LABELS, TAG_COLORS, CATEGORY_ICONS, CATEGORY_ORDER, FoodTier } from '@/types';
 import { getRecipeById } from '@/lib/recipes';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import TierBadge from '@/components/ui/TierBadge';
 import { cn } from '@/lib/utils';
 
 export default function RecipeDetailPage() {
@@ -70,9 +71,12 @@ export default function RecipeDetailPage() {
             <span className="text-sm">Volver a recetas</span>
           </Link>
 
-          <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-3">
-            {recipe.name}
-          </h1>
+          <div className="flex items-center gap-3 mb-3">
+            <h1 className="text-3xl sm:text-4xl font-bold text-foreground">
+              {recipe.name}
+            </h1>
+            {recipe.tier && <TierBadge tier={recipe.tier as FoodTier} size="lg" />}
+          </div>
 
           {recipe.description && (
             <p className="text-muted-foreground text-lg mb-4">{recipe.description}</p>
@@ -167,6 +171,30 @@ export default function RecipeDetailPage() {
               ))}
             </CardContent>
           </Card>
+
+          {/* Preparation */}
+          {recipe.preparation && recipe.preparation.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <ChefHat className="size-5 text-[#6c5ce7]" />
+                  Preparacion
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ol className="space-y-4">
+                  {recipe.preparation.map((step, i) => (
+                    <li key={i} className="flex gap-3">
+                      <span className="flex-shrink-0 size-7 rounded-full bg-[#6c5ce7]/15 text-[#6c5ce7] text-sm font-bold flex items-center justify-center mt-0.5">
+                        {i + 1}
+                      </span>
+                      <span className="text-foreground/80">{step}</span>
+                    </li>
+                  ))}
+                </ol>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Actions */}
           <div className="flex gap-3">

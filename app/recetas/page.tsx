@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Plus, BookOpen } from 'lucide-react';
+import { Plus, BookOpen, Sparkles } from 'lucide-react';
 import { Recipe } from '@/types';
 import { getRecipes } from '@/lib/recipes';
 import RecipeCard from '@/components/recipes/RecipeCard';
@@ -77,12 +77,20 @@ export default function RecetasPage() {
               </p>
             </div>
           </div>
-          <Link href="/recetas/nueva">
-            <Button size="lg" className="bg-[#00b894] hover:bg-[#00a382] text-white">
-              <Plus className="size-4" />
-              Nueva Receta
-            </Button>
-          </Link>
+          <div className="flex gap-3">
+            <Link href="/recetas/nueva-ai">
+              <Button size="lg" className="bg-[#6c5ce7] hover:bg-[#5b4bd6] text-white">
+                <Sparkles className="size-4" />
+                Generar con AI
+              </Button>
+            </Link>
+            <Link href="/recetas/nueva">
+              <Button size="lg" className="bg-[#00b894] hover:bg-[#00a382] text-white">
+                <Plus className="size-4" />
+                Nueva Receta
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 

@@ -7,6 +7,8 @@ function parseRecipe(raw: Record<string, unknown>): Recipe {
     ...raw,
     tags: typeof raw.tags === 'string' ? JSON.parse(raw.tags) : (raw.tags || []),
     ingredients: typeof raw.ingredients === 'string' ? JSON.parse(raw.ingredients) : (raw.ingredients || []),
+    preparation: typeof raw.preparation === 'string' ? JSON.parse(raw.preparation) : (raw.preparation || null),
+    tier: raw.tier || 'bueno',
   } as Recipe;
 }
 
@@ -87,6 +89,7 @@ export async function addRecipe(
       ...recipe,
       tags: JSON.stringify(recipe.tags),
       ingredients: JSON.stringify(recipe.ingredients),
+      preparation: recipe.preparation ? JSON.stringify(recipe.preparation) : null,
     };
 
     const { data, error } = await supabase
@@ -118,6 +121,7 @@ export async function updateRecipe(
     const payload: Record<string, unknown> = { ...updates };
     if (updates.tags) payload.tags = JSON.stringify(updates.tags);
     if (updates.ingredients) payload.ingredients = JSON.stringify(updates.ingredients);
+    if (updates.preparation) payload.preparation = JSON.stringify(updates.preparation);
 
     const { data, error } = await supabase
       .from('recipes')
