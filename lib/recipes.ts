@@ -84,8 +84,12 @@ export async function addRecipe(
   }
 
   try {
+    // Generate a unique ID (table uses TEXT PRIMARY KEY, not auto-generated)
+    const id = `custom_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+
     // Serialize arrays to JSON strings for TEXT columns
     const payload = {
+      id,
       ...recipe,
       tags: JSON.stringify(recipe.tags),
       ingredients: JSON.stringify(recipe.ingredients),
