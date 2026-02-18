@@ -3,9 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, CalendarPlus } from 'lucide-react';
+import { ArrowLeft, CalendarPlus, BookOpen } from 'lucide-react';
 import { Recipe, TAG_LABELS, TAG_COLORS, CATEGORY_ICONS, CATEGORY_ORDER } from '@/types';
 import { getRecipeById } from '@/lib/recipes';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { cn } from '@/lib/utils';
 
 export default function RecipeDetailPage() {
   const params = useParams();
@@ -25,16 +30,16 @@ export default function RecipeDetailPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
-        <div className="text-gray-500">Cargando receta...</div>
+      <main className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-muted-foreground">Cargando receta...</div>
       </main>
     );
   }
 
   if (!recipe) {
     return (
-      <main className="min-h-screen bg-[#0a0a0f] flex flex-col items-center justify-center gap-4">
-        <div className="text-gray-500">Receta no encontrada</div>
+      <main className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
+        <div className="text-muted-foreground">Receta no encontrada</div>
         <Link href="/recetas" className="text-[#6c5ce7] hover:underline">
           Volver a recetas
         </Link>
@@ -53,50 +58,56 @@ export default function RecipeDetailPage() {
   const orderedCategories = CATEGORY_ORDER.filter((cat) => groupedIngredients[cat]);
 
   return (
-    <main className="min-h-screen bg-[#0a0a0f]">
+    <main className="min-h-screen bg-background">
       {/* Header */}
-      <section className="py-8 px-4 sm:px-6 lg:px-8 border-b border-[#1a1a2e]">
-        <div className="max-w-4xl mx-auto">
+      <section className="border-b border-border bg-gradient-to-b from-primary/5 to-transparent">
+        <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <Link
             href="/recetas"
-            className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-6"
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="size-4" />
             <span className="text-sm">Volver a recetas</span>
           </Link>
 
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3">
+          <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-3">
             {recipe.name}
           </h1>
 
           {recipe.description && (
-            <p className="text-gray-400 text-lg mb-4">{recipe.description}</p>
+            <p className="text-muted-foreground text-lg mb-4">{recipe.description}</p>
           )}
 
           {/* Tags */}
           <div className="flex flex-wrap gap-2 mb-4">
             {recipe.tags.map((tag) => (
-              <span
+              <Badge
                 key={tag}
-                className={`px-3 py-1 rounded-full text-xs font-medium border ${TAG_COLORS[tag] || 'bg-gray-500/15 text-gray-400 border-gray-500/30'}`}
+                variant="outline"
+                className={cn(
+                  'rounded-full px-3 py-1 text-xs font-medium',
+                  TAG_COLORS[tag] || 'bg-gray-500/15 text-gray-400 border-gray-500/30'
+                )}
               >
                 {TAG_LABELS[tag] || tag}
-              </span>
+              </Badge>
             ))}
           </div>
 
           {/* Warning */}
           {recipe.warning_level !== 'none' && (
-            <div
-              className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium ${
+            <Badge
+              variant="outline"
+              className={cn(
+                'rounded-lg px-3 py-1.5 text-sm font-medium border-transparent',
                 recipe.warning_level === 'avoid'
                   ? 'bg-[#d63031]/15 text-[#d63031]'
                   : 'bg-[#e17055]/15 text-[#e17055]'
-              }`}
+              )}
             >
-              {recipe.warning_level === 'avoid' ? '🔴' : '🟠'}
+              {recipe.warning_level === 'avoid' ? '🔴' : '🟠'}{' '}
               {recipe.warning_reason || (recipe.warning_level === 'avoid' ? 'Evitar' : 'Precaucion')}
-            </div>
+            </Badge>
           )}
         </div>
       </section>
@@ -104,43 +115,49 @@ export default function RecipeDetailPage() {
       <section className="py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto space-y-8">
           {/* Macros */}
-          <div>
-            <h2 className="text-lg font-semibold text-white mb-4">Informacion Nutricional</h2>
-            <div className="grid grid-cols-4 gap-3">
-              <div className="bg-[#12121a] border border-[#1a1a2e] rounded-xl p-4 text-center">
-                <div className="text-2xl font-bold text-[#f59e0b]">{recipe.kcal}</div>
-                <div className="text-xs text-gray-500 mt-1">kcal</div>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Informacion Nutricional</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-4 gap-3">
+                <div className="rounded-xl border border-border bg-muted/50 p-4 text-center">
+                  <div className="text-2xl font-bold text-[#fdcb6e]">{recipe.kcal}</div>
+                  <div className="text-xs text-muted-foreground mt-1">kcal</div>
+                </div>
+                <div className="rounded-xl border border-border bg-muted/50 p-4 text-center">
+                  <div className="text-2xl font-bold text-[#00b894]">{recipe.protein}g</div>
+                  <div className="text-xs text-muted-foreground mt-1">Proteina</div>
+                </div>
+                <div className="rounded-xl border border-border bg-muted/50 p-4 text-center">
+                  <div className="text-2xl font-bold text-[#74b9ff]">{recipe.carbs}g</div>
+                  <div className="text-xs text-muted-foreground mt-1">Carbos</div>
+                </div>
+                <div className="rounded-xl border border-border bg-muted/50 p-4 text-center">
+                  <div className="text-2xl font-bold text-[#e17055]">{recipe.fat}g</div>
+                  <div className="text-xs text-muted-foreground mt-1">Grasas</div>
+                </div>
               </div>
-              <div className="bg-[#12121a] border border-[#1a1a2e] rounded-xl p-4 text-center">
-                <div className="text-2xl font-bold text-[#10b981]">{recipe.protein}g</div>
-                <div className="text-xs text-gray-500 mt-1">Proteina</div>
-              </div>
-              <div className="bg-[#12121a] border border-[#1a1a2e] rounded-xl p-4 text-center">
-                <div className="text-2xl font-bold text-[#3b82f6]">{recipe.carbs}g</div>
-                <div className="text-xs text-gray-500 mt-1">Carbos</div>
-              </div>
-              <div className="bg-[#12121a] border border-[#1a1a2e] rounded-xl p-4 text-center">
-                <div className="text-2xl font-bold text-[#eab308]">{recipe.fat}g</div>
-                <div className="text-xs text-gray-500 mt-1">Grasas</div>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Ingredients */}
-          <div>
-            <h2 className="text-lg font-semibold text-white mb-4">Ingredientes</h2>
-            <div className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Ingredientes</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
               {orderedCategories.map((cat) => (
-                <div key={cat} className="bg-[#12121a] border border-[#1a1a2e] rounded-xl overflow-hidden">
-                  <div className="px-4 py-3 bg-[#1a1a2e]/50 flex items-center gap-2">
+                <div key={cat} className="rounded-xl border border-border overflow-hidden">
+                  <div className="px-4 py-3 bg-muted/50 flex items-center gap-2">
                     <span>{CATEGORY_ICONS[cat] || '📦'}</span>
-                    <span className="text-sm font-medium text-white">{cat}</span>
+                    <span className="text-sm font-medium text-foreground">{cat}</span>
                   </div>
-                  <div className="divide-y divide-[#1a1a2e]">
+                  <div className="divide-y divide-border">
                     {groupedIngredients[cat].map((ing, i) => (
                       <div key={i} className="px-4 py-3 flex justify-between items-center">
-                        <span className="text-gray-300">{ing.name}</span>
-                        <span className="text-gray-500 text-sm">
+                        <span className="text-foreground/80">{ing.name}</span>
+                        <span className="text-muted-foreground text-sm">
                           {ing.qty} {ing.unit}
                         </span>
                       </div>
@@ -148,24 +165,23 @@ export default function RecipeDetailPage() {
                   </div>
                 </div>
               ))}
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Actions */}
           <div className="flex gap-3">
-            <Link
-              href="/planificador"
-              className="flex items-center gap-2 px-5 py-3 bg-[#6c5ce7] text-white rounded-xl font-medium hover:bg-[#5b4bd6] transition-colors"
-            >
-              <CalendarPlus className="w-5 h-5" />
-              Agregar al Plan
-            </Link>
-            <Link
-              href="/recetas"
-              className="flex items-center gap-2 px-5 py-3 bg-[#1a1a2e] text-gray-400 rounded-xl hover:bg-[#2a2a3e] transition-colors"
-            >
-              Ver Todas las Recetas
-            </Link>
+            <Button asChild size="lg" className="bg-[#6c5ce7] hover:bg-[#5b4bd6] text-white">
+              <Link href="/planificador" className="flex items-center gap-2">
+                <CalendarPlus className="size-5" />
+                Agregar al Plan
+              </Link>
+            </Button>
+            <Button asChild variant="secondary" size="lg">
+              <Link href="/recetas" className="flex items-center gap-2">
+                <BookOpen className="size-5" />
+                Ver Todas las Recetas
+              </Link>
+            </Button>
           </div>
         </div>
       </section>

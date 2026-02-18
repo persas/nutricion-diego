@@ -2,6 +2,9 @@
 
 import { useCallback, useRef, useState } from 'react';
 import { Camera, Upload, X } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface PhotoUploadProps {
   onImageSelect: (base64: string) => void;
@@ -69,33 +72,36 @@ export default function PhotoUpload({ onImageSelect, preview, onClear }: PhotoUp
 
   if (preview) {
     return (
-      <div className="relative rounded-xl overflow-hidden border border-[#2a2a3e]">
+      <Card className="relative overflow-hidden py-0 gap-0">
         <img
           src={preview}
           alt="Preview"
           className="w-full h-64 object-cover"
         />
-        <button
+        <Button
           onClick={onClear}
-          className="absolute top-3 right-3 p-2 bg-black/60 rounded-full hover:bg-black/80 transition-colors"
+          variant="ghost"
+          size="icon"
+          className="absolute top-3 right-3 bg-black/60 hover:bg-black/80 text-white rounded-full size-9"
         >
-          <X className="w-5 h-5 text-white" />
-        </button>
-      </div>
+          <X className="w-5 h-5" />
+        </Button>
+      </Card>
     );
   }
 
   return (
-    <div
+    <Card
       onDrop={handleDrop}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onClick={() => fileInputRef.current?.click()}
-      className={`flex flex-col items-center justify-center gap-4 p-8 rounded-xl border-2 border-dashed cursor-pointer transition-all ${
+      className={cn(
+        'flex flex-col items-center justify-center gap-4 p-8 border-2 border-dashed cursor-pointer transition-all duration-200',
         isDragging
-          ? 'border-[#6c5ce7] bg-[#6c5ce7]/10'
-          : 'border-[#2a2a3e] hover:border-[#6c5ce7]/50 hover:bg-[#12121a]'
-      }`}
+          ? 'border-[#6c5ce7] bg-[#6c5ce7]/10 shadow-[0_0_20px_rgba(108,92,231,0.1)]'
+          : 'border-border hover:border-[#6c5ce7]/50 hover:bg-card/80'
+      )}
     >
       <div className="flex gap-3">
         <div className="p-3 rounded-full bg-[#6c5ce7]/15">
@@ -106,8 +112,8 @@ export default function PhotoUpload({ onImageSelect, preview, onClear }: PhotoUp
         </div>
       </div>
       <div className="text-center">
-        <p className="text-gray-300 font-medium">Haz una foto o arrastra una imagen</p>
-        <p className="text-gray-500 text-sm mt-1">JPG, PNG hasta 10MB</p>
+        <p className="text-foreground font-medium">Haz una foto o arrastra una imagen</p>
+        <p className="text-muted-foreground text-sm mt-1">JPG, PNG hasta 10MB</p>
       </div>
       <input
         ref={fileInputRef}
@@ -120,6 +126,6 @@ export default function PhotoUpload({ onImageSelect, preview, onClear }: PhotoUp
           if (file) handleFile(file);
         }}
       />
-    </div>
+    </Card>
   );
 }

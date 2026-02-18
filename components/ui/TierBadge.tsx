@@ -1,6 +1,7 @@
 'use client';
 
 import { FoodTier, TIER_CONFIG } from '@/types';
+import { cn } from '@/lib/utils';
 
 interface TierBadgeProps {
   tier: FoodTier;
@@ -12,15 +13,22 @@ export default function TierBadge({ tier, size = 'md' }: TierBadgeProps) {
   if (!config) return null;
 
   const sizeClasses = {
-    sm: 'text-xs px-2 py-0.5',
-    md: 'text-sm px-3 py-1',
-    lg: 'text-base px-4 py-1.5',
+    sm: 'text-[10px] px-2 py-0.5 gap-1',
+    md: 'text-xs px-2.5 py-1 gap-1',
+    lg: 'text-sm px-3 py-1.5 gap-1.5',
   };
 
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full font-semibold ${sizeClasses[size]}`}
-      style={{ backgroundColor: config.bgColor, color: config.color }}
+      className={cn(
+        'inline-flex items-center rounded-full font-semibold border whitespace-nowrap',
+        sizeClasses[size]
+      )}
+      style={{
+        backgroundColor: config.bgColor,
+        color: config.color,
+        borderColor: `${config.color}33`,
+      }}
     >
       {config.emoji} {config.label}
     </span>

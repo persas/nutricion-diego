@@ -1,10 +1,15 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import { Search } from 'lucide-react';
+import { Search, X, SlidersHorizontal, Utensils } from 'lucide-react';
 import { FoodItem, FoodTier, TIER_CONFIG } from '@/types';
 import { getAllFoodItems } from '@/lib/food-items';
 import TierBadge from '@/components/ui/TierBadge';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 
 const TIERS: FoodTier[] = ['excelente', 'bueno', 'neutro', 'precaucion', 'evitar'];
 
@@ -96,110 +101,145 @@ export default function AlimentosPage() {
   const hasActiveFilters = searchQuery.trim() || activeTiers.size > 0 || activeCategory;
 
   return (
-    <main className="min-h-screen bg-[#0a0a0f]">
+    <main className="min-h-screen bg-background">
       {/* Header */}
-      <section className="py-8 px-4 sm:px-6 lg:px-8 border-b border-[#1a1a2e]">
-        <div className="max-w-5xl mx-auto">
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">
+      <section className="border-b border-border bg-gradient-to-br from-primary/5 via-background to-accent/5">
+        <div className="max-w-5xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 border border-primary/20">
+              <Utensils className="w-5 h-5 text-primary" />
+            </div>
+            <Badge variant="outline" className="text-xs font-semibold tracking-wider uppercase text-primary border-primary/30">
+              Base de datos
+            </Badge>
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
             Clasificacion de Alimentos
           </h1>
-          <p className="text-gray-400">
+          <p className="text-muted-foreground mt-2 text-base max-w-lg">
             Busca cualquier alimento para ver su clasificacion anti-inflamatoria
           </p>
         </div>
       </section>
 
-      <section className="py-6 px-4 sm:px-6 lg:px-8 border-b border-[#1a1a2e] sticky top-0 z-10 bg-[#0a0a0f]">
-        <div className="max-w-5xl mx-auto space-y-4">
+      {/* Sticky Filter Bar */}
+      <section className="border-b border-border sticky top-0 z-10 bg-background/80 backdrop-blur-xl">
+        <div className="max-w-5xl mx-auto py-5 px-4 sm:px-6 lg:px-8 space-y-4">
           {/* Search */}
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-            <input
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder='Buscar alimento... ej: "lentejas", "salmon", "chocolate"'
-              className="w-full pl-12 pr-4 py-3 bg-[#12121a] border border-[#1a1a2e] rounded-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-[#6c5ce7] transition-colors text-lg"
+              className="pl-10 pr-10 h-11 text-base bg-card border-border rounded-lg"
             />
             {searchQuery && (
-              <button
+              <Button
+                variant="ghost"
+                size="icon-xs"
                 onClick={() => setSearchQuery('')}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               >
-                ✕
-              </button>
+                <X className="w-3.5 h-3.5" />
+              </Button>
             )}
           </div>
 
           {/* Tier Filters */}
-          <div className="flex flex-wrap gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <SlidersHorizontal className="w-3.5 h-3.5 text-muted-foreground mr-0.5 hidden sm:block" />
             {TIERS.map((tier) => {
               const config = TIER_CONFIG[tier];
               const isActive = activeTiers.has(tier);
               return (
-                <button
+                <Button
                   key={tier}
+                  variant="outline"
+                  size="sm"
                   onClick={() => toggleTier(tier)}
-                  className="px-3 py-1.5 rounded-full text-sm font-medium border transition-all"
-                  style={{
-                    backgroundColor: isActive ? config.bgColor : 'transparent',
-                    borderColor: isActive ? config.color : '#2a2a3e',
-                    color: isActive ? config.color : '#6b7280',
-                  }}
+                  className={cn(
+                    'rounded-full text-xs font-medium transition-all',
+                    isActive
+                      ? 'border-transparent'
+                      : 'border-border text-muted-foreground hover:text-foreground'
+                  )}
+                  style={
+                    isActive
+                      ? {
+                          backgroundColor: config.bgColor,
+                          borderColor: config.color,
+                          color: config.color,
+                        }
+                      : undefined
+                  }
                 >
                   {config.emoji} {config.label}
-                </button>
+                </Button>
               );
             })}
           </div>
 
           {/* Category Filters */}
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5">
             {CATEGORIES.map((cat) => (
-              <button
+              <Badge
                 key={cat}
-                onClick={() => setActiveCategory(activeCategory === cat ? null : cat)}
-                className={`px-3 py-1 rounded-full text-xs font-medium border transition-all ${
+                variant="outline"
+                className={cn(
+                  'cursor-pointer select-none transition-all text-xs font-medium px-2.5 py-0.5',
                   activeCategory === cat
-                    ? 'border-[#6c5ce7] bg-[#6c5ce7]/15 text-[#6c5ce7]'
-                    : 'border-[#2a2a3e] text-gray-500 hover:border-[#3a3a4e] hover:text-gray-400'
-                }`}
+                    ? 'border-primary bg-primary/10 text-primary'
+                    : 'border-border text-muted-foreground hover:border-muted-foreground/40 hover:text-foreground'
+                )}
+                onClick={() => setActiveCategory(activeCategory === cat ? null : cat)}
               >
                 {cat}
-              </button>
+              </Badge>
             ))}
           </div>
 
           {/* Results count */}
           {!loading && (
-            <div className="text-sm text-gray-500">
-              {filteredItems.length} alimentos
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span className="tabular-nums font-medium">{filteredItems.length}</span>
+              <span>alimentos</span>
               {hasActiveFilters && (
-                <button
+                <Button
+                  variant="link"
+                  size="sm"
                   onClick={() => {
                     setSearchQuery('');
                     setActiveTiers(new Set());
                     setActiveCategory(null);
                   }}
-                  className="ml-3 text-[#6c5ce7] hover:underline"
+                  className="text-primary h-auto p-0 ml-1"
                 >
                   Limpiar filtros
-                </button>
+                </Button>
               )}
             </div>
           )}
         </div>
       </section>
 
+      {/* Content */}
       <section className="py-6 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto">
           {loading ? (
-            <div className="text-center py-12 text-gray-500">Cargando alimentos...</div>
+            <div className="flex flex-col items-center justify-center py-20 gap-3">
+              <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+              <p className="text-muted-foreground text-sm">Cargando alimentos...</p>
+            </div>
           ) : filteredItems.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">No se encontraron alimentos</p>
+            <div className="text-center py-20">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-muted/50 mb-4">
+                <Search className="w-7 h-7 text-muted-foreground" />
+              </div>
+              <p className="text-foreground font-medium text-lg">No se encontraron alimentos</p>
               {searchQuery && (
-                <p className="text-gray-600 text-sm mt-2">
+                <p className="text-muted-foreground text-sm mt-1.5">
                   Prueba con otro termino de busqueda
                 </p>
               )}
@@ -213,7 +253,7 @@ export default function AlimentosPage() {
             </div>
           ) : (
             /* Grouped by tier when browsing */
-            <div className="space-y-8">
+            <div className="space-y-10">
               {TIERS.map((tier) => {
                 const items = groupedByTier[tier];
                 if (items.length === 0) return null;
@@ -225,10 +265,12 @@ export default function AlimentosPage() {
                         className="w-1 h-8 rounded-full"
                         style={{ backgroundColor: config.color }}
                       />
-                      <h2 className="text-xl font-bold text-white">
+                      <h2 className="text-xl font-bold text-foreground">
                         {config.emoji} {config.label}
                       </h2>
-                      <span className="text-sm text-gray-500">{items.length} alimentos</span>
+                      <Badge variant="secondary" className="text-xs tabular-nums">
+                        {items.length}
+                      </Badge>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                       {items.map((item) => (
@@ -248,23 +290,29 @@ export default function AlimentosPage() {
 
 function FoodItemCard({ item }: { item: FoodItem }) {
   return (
-    <div className="bg-[#12121a] border border-[#1a1a2e] rounded-lg p-4 hover:border-[#2a2a3e] transition-colors">
-      <div className="flex items-start justify-between gap-2 mb-2">
-        <h3 className="text-white font-medium">
-          {item.emoji && <span className="mr-1.5">{item.emoji}</span>}
-          {item.name}
-        </h3>
-        <TierBadge tier={item.tier as FoodTier} size="sm" />
-      </div>
-      {item.benefits && (
-        <p className="text-gray-400 text-sm">{item.benefits}</p>
-      )}
-      {item.warnings && (
-        <p className="text-[#e17055] text-xs mt-1">{item.warnings}</p>
-      )}
-      <div className="mt-2">
-        <span className="text-xs text-gray-600">{item.category}</span>
-      </div>
-    </div>
+    <Card className="py-0 gap-0 border-border bg-card hover:border-muted-foreground/25 transition-all duration-200 group">
+      <CardContent className="p-4">
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <h3 className="text-foreground font-medium leading-snug group-hover:text-primary transition-colors">
+            {item.emoji && <span className="mr-1.5">{item.emoji}</span>}
+            {item.name}
+          </h3>
+          <TierBadge tier={item.tier as FoodTier} size="sm" />
+        </div>
+        {item.benefits && (
+          <p className="text-muted-foreground text-sm leading-relaxed">{item.benefits}</p>
+        )}
+        {item.warnings && (
+          <p className="text-sm mt-1.5 leading-relaxed" style={{ color: '#e17055' }}>
+            {item.warnings}
+          </p>
+        )}
+        <div className="mt-2.5 pt-2.5 border-t border-border">
+          <Badge variant="secondary" className="text-[11px] font-normal">
+            {item.category}
+          </Badge>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

@@ -2,6 +2,10 @@
 
 import Link from 'next/link';
 import { Recipe, TAG_LABELS, TAG_COLORS } from '@/types';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { cn } from '@/lib/utils';
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -31,75 +35,89 @@ export default function RecipeCard({
     return 'transparent';
   };
 
-  const borderClass = selected
-    ? 'border-2 border-[#00b894] shadow-lg shadow-[#00b894]/20'
-    : disabled
-      ? 'border-2 border-[#2a2a3e] opacity-50'
-      : selectable
-        ? 'border-2 border-[#2a2a3e] hover:border-[#6c5ce7] transition-colors'
-        : 'border border-[#2a2a3e] hover:border-[#6c5ce7]/50 transition-colors';
-
   const content = (
-    <div
+    <Card
       onClick={disabled ? undefined : onClick}
-      className={`bg-[#12121a] rounded-lg p-6 transition-all ${borderClass} ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'} ${selectable && !disabled ? 'hover:shadow-lg hover:shadow-[#6c5ce7]/10' : ''}`}
+      className={cn(
+        'transition-all',
+        selected
+          ? 'border-2 border-[#00b894] shadow-lg shadow-[#00b894]/20'
+          : disabled
+            ? 'border-2 border-border opacity-50'
+            : selectable
+              ? 'border-2 border-border hover:border-[#6c5ce7] transition-colors'
+              : 'border border-border hover:border-[#6c5ce7]/50 transition-colors',
+        disabled ? 'cursor-not-allowed' : 'cursor-pointer',
+        selectable && !disabled ? 'hover:shadow-lg hover:shadow-[#6c5ce7]/10' : ''
+      )}
     >
-      {/* Header with title and warning indicator */}
-      <div className="flex items-start justify-between mb-3">
-        <h3 className="text-lg font-semibold text-white flex-1 pr-2">{recipe.name}</h3>
-        {recipe.warning_level !== 'none' && (
-          <div
-            className="w-3 h-3 rounded-full flex-shrink-0 mt-1"
-            style={{ backgroundColor: getWarningColor() }}
-            title={recipe.warning_reason || `Nivel: ${recipe.warning_level}`}
-          />
+      <CardHeader className="pb-0">
+        {/* Header with title and warning indicator */}
+        <div className="flex items-start justify-between">
+          <CardTitle className="text-lg flex-1 pr-2">{recipe.name}</CardTitle>
+          {recipe.warning_level !== 'none' && (
+            <div
+              className="size-3 rounded-full flex-shrink-0 mt-1"
+              style={{ backgroundColor: getWarningColor() }}
+              title={recipe.warning_reason || `Nivel: ${recipe.warning_level}`}
+            />
+          )}
+        </div>
+      </CardHeader>
+
+      <CardContent className="space-y-4">
+        {/* Description */}
+        <p className="text-sm text-muted-foreground">{truncatedDescription}</p>
+
+        {/* Macros row */}
+        <div className="flex gap-4 text-sm">
+          <div className="flex items-center gap-1">
+            <span className="text-muted-foreground">kcal:</span>
+            <span className="text-[#6c5ce7] font-semibold">{recipe.kcal}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="text-muted-foreground">P:</span>
+            <span className="text-[#00d2d3] font-semibold">{recipe.protein}g</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="text-muted-foreground">C:</span>
+            <span className="text-[#6c5ce7] font-semibold">{recipe.carbs}g</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="text-muted-foreground">G:</span>
+            <span className="text-[#00b894] font-semibold">{recipe.fat}g</span>
+          </div>
+        </div>
+
+        {/* Tags */}
+        {recipe.tags.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {recipe.tags.map((tag) => (
+              <Badge
+                key={tag}
+                variant="outline"
+                className={cn(
+                  'rounded-full text-xs px-2.5 py-0.5',
+                  TAG_COLORS[tag] || 'bg-gray-500/15 text-gray-400 border-gray-500/30'
+                )}
+              >
+                {TAG_LABELS[tag] || tag}
+              </Badge>
+            ))}
+          </div>
         )}
-      </div>
 
-      {/* Description */}
-      <p className="text-sm text-gray-400 mb-4">{truncatedDescription}</p>
-
-      {/* Macros row */}
-      <div className="flex gap-4 mb-4 text-sm">
-        <div className="flex items-center gap-1">
-          <span className="text-gray-500">kcal:</span>
-          <span className="text-[#6c5ce7] font-semibold">{recipe.kcal}</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <span className="text-gray-500">P:</span>
-          <span className="text-[#00d2d3] font-semibold">{recipe.protein}g</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <span className="text-gray-500">C:</span>
-          <span className="text-[#6c5ce7] font-semibold">{recipe.carbs}g</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <span className="text-gray-500">G:</span>
-          <span className="text-[#00b894] font-semibold">{recipe.fat}g</span>
-        </div>
-      </div>
-
-      {/* Tags */}
-      {recipe.tags.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {recipe.tags.map((tag) => (
-            <span
-              key={tag}
-              className={`text-xs px-2.5 py-1 rounded-full border ${TAG_COLORS[tag] || 'bg-gray-500/15 text-gray-400 border-gray-500/30'}`}
-            >
-              {TAG_LABELS[tag] || tag}
-            </span>
-          ))}
-        </div>
-      )}
-
-      {/* Selection indicator */}
-      {selectable && selected && (
-        <div className="mt-4 pt-4 border-t border-[#2a2a3e] flex items-center justify-end">
-          <div className="text-[#00b894] text-sm font-semibold">✓ Seleccionado</div>
-        </div>
-      )}
-    </div>
+        {/* Selection indicator */}
+        {selectable && selected && (
+          <>
+            <Separator />
+            <div className="flex items-center justify-end">
+              <div className="text-[#00b894] text-sm font-semibold">✓ Seleccionado</div>
+            </div>
+          </>
+        )}
+      </CardContent>
+    </Card>
   );
 
   // Wrap in Link when href is provided and not in selectable mode

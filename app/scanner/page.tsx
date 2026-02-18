@@ -5,6 +5,11 @@ import { Send, Loader2, ShoppingCart, UtensilsCrossed, Scan } from 'lucide-react
 import PhotoUpload from '@/components/scanner/PhotoUpload';
 import ScanResult from '@/components/scanner/ScanResult';
 import { FoodScanResult, ScanMode } from '@/types';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 const MODES = [
   { id: 'general' as ScanMode, label: 'General', icon: Scan, description: 'Evaluar cualquier comida' },
@@ -68,14 +73,18 @@ export default function ScannerPage() {
   const canAnalyze = (imagePreview || textInput.trim()) && !isLoading;
 
   return (
-    <main className="min-h-screen bg-[#0a0a0f]">
+    <main className="min-h-screen bg-background">
       {/* Header */}
-      <section className="py-8 px-4 sm:px-6 lg:px-8 border-b border-[#1a1a2e]">
+      <section className="py-8 px-4 sm:px-6 lg:px-8 border-b border-border bg-gradient-to-b from-[#6c5ce7]/5 to-transparent">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">
+          <Badge variant="outline" className="mb-3 border-[#6c5ce7]/30 bg-[#6c5ce7]/10 text-[#6c5ce7]">
+            <Scan className="size-3" />
+            Scanner IA
+          </Badge>
+          <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
             Scanner de Comida
           </h1>
-          <p className="text-gray-400">
+          <p className="text-muted-foreground">
             Sube una foto o describe lo que vas a comer para obtener un analisis nutricional
           </p>
         </div>
@@ -87,20 +96,26 @@ export default function ScannerPage() {
           <div className="grid grid-cols-3 gap-3">
             {MODES.map((m) => {
               const Icon = m.icon;
+              const isActive = mode === m.id;
               return (
-                <button
+                <Card
                   key={m.id}
                   onClick={() => setMode(m.id)}
-                  className={`flex flex-col items-center gap-2 p-4 rounded-xl border transition-all ${
-                    mode === m.id
-                      ? 'border-[#6c5ce7] bg-[#6c5ce7]/10 text-white'
-                      : 'border-[#1a1a2e] bg-[#12121a] text-gray-400 hover:border-[#2a2a3e]'
-                  }`}
+                  className={cn(
+                    'cursor-pointer py-4 transition-all duration-200',
+                    isActive
+                      ? 'border-[#6c5ce7] bg-[#6c5ce7]/10 shadow-[0_0_15px_rgba(108,92,231,0.15)]'
+                      : 'hover:border-[#6c5ce7]/30 hover:bg-card/80'
+                  )}
                 >
-                  <Icon className="w-5 h-5" />
-                  <span className="text-sm font-medium">{m.label}</span>
-                  <span className="text-[10px] text-gray-500 hidden sm:block">{m.description}</span>
-                </button>
+                  <CardContent className="flex flex-col items-center gap-2 px-3">
+                    <Icon className={cn('w-5 h-5', isActive ? 'text-[#6c5ce7]' : 'text-muted-foreground')} />
+                    <span className={cn('text-sm font-medium', isActive ? 'text-foreground' : 'text-muted-foreground')}>
+                      {m.label}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground hidden sm:block">{m.description}</span>
+                  </CardContent>
+                </Card>
               );
             })}
           </div>
@@ -114,22 +129,23 @@ export default function ScannerPage() {
 
           {/* Text Input */}
           <div className="space-y-2">
-            <label className="text-sm text-gray-400">
+            <label className="text-sm text-muted-foreground">
               {imagePreview ? 'Contexto adicional (opcional)' : 'O describe lo que quieres analizar'}
             </label>
             <div className="flex gap-2">
-              <input
+              <Input
                 type="text"
                 value={textInput}
                 onChange={(e) => setTextInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && canAnalyze && handleAnalyze()}
                 placeholder="ej: lentejas con chorizo y patatas"
-                className="flex-1 bg-[#12121a] border border-[#1a1a2e] rounded-xl px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:border-[#6c5ce7] transition-colors"
+                className="h-11 flex-1 rounded-xl bg-card border-border placeholder:text-muted-foreground/50 focus-visible:border-[#6c5ce7] focus-visible:ring-[#6c5ce7]/30"
               />
-              <button
+              <Button
                 onClick={handleAnalyze}
                 disabled={!canAnalyze}
-                className="px-6 py-3 bg-[#6c5ce7] text-white rounded-xl font-medium hover:bg-[#5b4bd6] transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+                size="lg"
+                className="h-11 rounded-xl bg-[#6c5ce7] hover:bg-[#5b4bd6] text-white px-6"
               >
                 {isLoading ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
@@ -137,22 +153,26 @@ export default function ScannerPage() {
                   <Send className="w-5 h-5" />
                 )}
                 <span className="hidden sm:inline">Analizar</span>
-              </button>
+              </Button>
             </div>
           </div>
 
           {/* Error */}
           {error && (
-            <div className="bg-[#d63031]/10 border border-[#d63031]/30 rounded-xl p-4 text-[#d63031] text-sm">
-              {error}
-            </div>
+            <Card className="border-[#d63031]/30 bg-[#d63031]/10 py-0">
+              <CardContent className="py-4">
+                <p className="text-[#d63031] text-sm">{error}</p>
+              </CardContent>
+            </Card>
           )}
 
           {/* Loading */}
           {isLoading && (
             <div className="flex flex-col items-center gap-3 py-12">
-              <Loader2 className="w-8 h-8 animate-spin text-[#6c5ce7]" />
-              <p className="text-gray-400 text-sm">Analizando con IA...</p>
+              <div className="p-4 rounded-full bg-[#6c5ce7]/10">
+                <Loader2 className="w-8 h-8 animate-spin text-[#6c5ce7]" />
+              </div>
+              <p className="text-muted-foreground text-sm">Analizando con IA...</p>
             </div>
           )}
 
@@ -160,12 +180,13 @@ export default function ScannerPage() {
           {result && (
             <div className="space-y-4">
               <ScanResult result={result} />
-              <button
+              <Button
                 onClick={handleClear}
-                className="w-full py-3 bg-[#1a1a2e] text-gray-400 rounded-xl hover:bg-[#2a2a3e] transition-colors text-sm"
+                variant="secondary"
+                className="w-full rounded-xl h-11"
               >
                 Nuevo analisis
-              </button>
+              </Button>
             </div>
           )}
         </div>

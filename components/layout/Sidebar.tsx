@@ -2,98 +2,130 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import {
+  LayoutDashboard, Camera, Apple, ChefHat, CalendarDays,
+  UtensilsCrossed, Pill, FlaskConical, Target
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
-const navItems = [
-  { href: '/', label: 'Dashboard', icon: '📊' },
-  { href: '/scanner', label: 'Scanner', icon: '📸' },
-  { href: '/alimentos', label: 'Alimentos', icon: '🥗' },
-  { href: '/planificador', label: 'Planificador', icon: '📋' },
-  { href: '/recetas', label: 'Recetas', icon: '👨‍🍳' },
-  { href: '/restaurante', label: 'Comer Fuera', icon: '🍽️' },
-  { href: '/suplementos', label: 'Suplementos', icon: '💊' },
-  { href: '/ciencia', label: 'Ciencia', icon: '🧬' },
-  { href: '/objetivos', label: 'Objetivos', icon: '🎯' },
+const mainNav = [
+  { href: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/scanner', label: 'Scanner', icon: Camera },
+  { href: '/alimentos', label: 'Alimentos', icon: Apple },
+  { href: '/recetas', label: 'Recetas', icon: ChefHat },
+  { href: '/planificador', label: 'Planificador', icon: CalendarDays },
+  { href: '/restaurante', label: 'Comer Fuera', icon: UtensilsCrossed },
+];
+
+const secondaryNav = [
+  { href: '/suplementos', label: 'Suplementos', icon: Pill },
+  { href: '/ciencia', label: 'Ciencia', icon: FlaskConical },
+  { href: '/objetivos', label: 'Objetivos', icon: Target },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const [isOpen, setIsOpen] = useState(false);
 
-  const isActive = (href: string) => pathname === href;
+  const isActive = (href: string) =>
+    href === '/' ? pathname === '/' : pathname.startsWith(href);
 
   return (
-    <>
-      {/* Mobile Hamburger Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-4 left-4 z-50 md:hidden p-2 rounded-lg bg-[#12121a] border border-[#1a1a2e]"
-      >
-        <svg
-          className="w-6 h-6 text-white"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          {isOpen ? (
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          ) : (
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-          )}
-        </svg>
-      </button>
+    <aside className="hidden md:flex flex-col w-[220px] border-r border-border bg-sidebar h-screen shrink-0">
+      {/* Logo */}
+      <div className="flex items-center gap-2.5 px-5 h-16 shrink-0">
+        <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
+          <span className="text-primary font-bold text-sm">N</span>
+        </div>
+        <div>
+          <h1 className="text-sm font-bold text-foreground tracking-tight">
+            NutriTrack
+          </h1>
+          <p className="text-[10px] text-muted-foreground leading-none">
+            Anti-inflamatorio
+          </p>
+        </div>
+      </div>
 
-      {/* Mobile Overlay */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-30 md:hidden"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
+      <Separator />
 
-      {/* Sidebar */}
-      <aside
-        className={`fixed md:relative top-0 left-0 h-screen w-60 bg-[#12121a] border-r border-[#1a1a2e] z-40 transition-transform hidden md:block ${
-          isOpen ? 'translate-x-0 !block' : '-translate-x-full'
-        } md:translate-x-0`}
-      >
-        <div className="p-6 flex flex-col h-full">
-          {/* Logo */}
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold">
-              <span className="text-white">Nutricion</span>
-              <span className="text-[#00b894]">.</span>
-            </h1>
-            <p className="text-xs text-gray-500 mt-1">Anti-inflamatorio</p>
-          </div>
-
-          {/* Navigation */}
-          <nav className="flex-1 space-y-1">
-            {navItems.map((item) => (
-              <Link
+      {/* Navigation */}
+      <ScrollArea className="flex-1 px-3 py-3">
+        <div className="space-y-1">
+          <p className="px-2 mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Principal
+          </p>
+          {mainNav.map((item) => {
+            const Icon = item.icon;
+            const active = isActive(item.href);
+            return (
+              <Button
                 key={item.href}
-                href={item.href}
-                onClick={() => setIsOpen(false)}
-                className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all ${
-                  isActive(item.href)
-                    ? 'bg-[#6c5ce7] text-white'
-                    : 'text-gray-400 hover:text-white hover:bg-[#1a1a2e]'
-                }`}
+                variant={active ? 'secondary' : 'ghost'}
+                size="sm"
+                className={cn(
+                  'w-full justify-start gap-2.5 h-9 text-[13px] font-medium',
+                  active
+                    ? 'bg-primary/15 text-primary hover:bg-primary/20 border border-primary/20'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+                asChild
               >
-                <span className="text-lg">{item.icon}</span>
-                <span className="font-medium text-sm">{item.label}</span>
-              </Link>
-            ))}
-          </nav>
+                <Link href={item.href}>
+                  <Icon className="h-4 w-4 shrink-0" />
+                  {item.label}
+                </Link>
+              </Button>
+            );
+          })}
+        </div>
 
-          {/* Footer Text */}
-          <div className="pt-6 border-t border-[#1a1a2e]">
-            <p className="text-xs text-gray-500 text-center">
-              Plan Anti-inflamatorio · Psoriasis
-            </p>
+        <Separator className="my-3" />
+
+        <div className="space-y-1">
+          <p className="px-2 mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Referencia
+          </p>
+          {secondaryNav.map((item) => {
+            const Icon = item.icon;
+            const active = isActive(item.href);
+            return (
+              <Button
+                key={item.href}
+                variant={active ? 'secondary' : 'ghost'}
+                size="sm"
+                className={cn(
+                  'w-full justify-start gap-2.5 h-8 text-xs font-medium',
+                  active
+                    ? 'bg-primary/15 text-primary hover:bg-primary/20 border border-primary/20'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+                asChild
+              >
+                <Link href={item.href}>
+                  <Icon className="h-3.5 w-3.5 shrink-0" />
+                  {item.label}
+                </Link>
+              </Button>
+            );
+          })}
+        </div>
+      </ScrollArea>
+
+      {/* Footer */}
+      <div className="px-4 py-3 border-t border-border">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-full bg-[#00b894]/20 flex items-center justify-center text-xs font-bold text-[#00b894]">
+            D
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-medium text-foreground truncate">Diego</p>
+            <p className="text-[10px] text-muted-foreground">Protocolo Psoriasis</p>
           </div>
         </div>
-      </aside>
-    </>
+      </div>
+    </aside>
   );
 }

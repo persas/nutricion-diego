@@ -2,10 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { Plus, BookOpen } from 'lucide-react';
 import { Recipe } from '@/types';
 import { getRecipes } from '@/lib/recipes';
 import RecipeCard from '@/components/recipes/RecipeCard';
 import RecipeFilters from '@/components/recipes/RecipeFilters';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 export default function RecetasPage() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -61,19 +64,24 @@ export default function RecetasPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#0a0a0f]">
-      <section className="py-8 px-4 sm:px-6 lg:px-8 border-b border-[#1a1a2e]">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">Recetas</h1>
-            <p className="text-gray-400">
-              Explora y gestiona tus recetas anti-inflamatorias
-            </p>
+    <main className="min-h-screen bg-background">
+      {/* Header */}
+      <section className="border-b border-border bg-gradient-to-b from-primary/5 to-transparent">
+        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+          <div className="flex items-start gap-3">
+            <BookOpen className="size-7 text-[#6c5ce7] mt-1" />
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-1">Recetas</h1>
+              <p className="text-muted-foreground">
+                Explora y gestiona tus recetas anti-inflamatorias
+              </p>
+            </div>
           </div>
           <Link href="/recetas/nueva">
-            <button className="bg-[#00b894] hover:bg-[#00a382] text-white px-6 py-3 rounded-lg font-medium transition-colors">
-              + Nueva Receta
-            </button>
+            <Button size="lg" className="bg-[#00b894] hover:bg-[#00a382] text-white">
+              <Plus className="size-4" />
+              Nueva Receta
+            </Button>
           </Link>
         </div>
       </section>
@@ -89,26 +97,26 @@ export default function RecetasPage() {
 
           {loading ? (
             <div className="text-center py-16">
-              <p className="text-gray-400 text-lg">Cargando recetas...</p>
+              <p className="text-muted-foreground text-lg">Cargando recetas...</p>
             </div>
           ) : error ? (
-            <div className="bg-[#d63031]/10 border border-[#d63031]/30 rounded-lg p-6 text-center">
-              <p className="text-[#d63031] font-medium">{error}</p>
-              <p className="text-gray-400 text-sm mt-2">
+            <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-6 text-center">
+              <p className="text-destructive font-medium">{error}</p>
+              <p className="text-muted-foreground text-sm mt-2">
                 Asegurate de tener Supabase configurado correctamente.
               </p>
             </div>
           ) : filteredRecipes.length === 0 ? (
             <div className="text-center py-16">
-              <p className="text-gray-400 text-lg mb-4">
+              <p className="text-muted-foreground text-lg mb-4">
                 {recipes.length === 0
                   ? 'No hay recetas disponibles aun.'
                   : 'No se encontraron recetas que coincidan con tu busqueda.'}
               </p>
               <Link href="/recetas/nueva">
-                <button className="bg-[#6c5ce7] hover:bg-[#5f4ccf] text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors">
+                <Button className="bg-[#6c5ce7] hover:bg-[#5f4ccf] text-white">
                   Crear primera receta
-                </button>
+                </Button>
               </Link>
             </div>
           ) : (
@@ -124,7 +132,7 @@ export default function RecetasPage() {
           )}
 
           {!loading && !error && recipes.length > 0 && (
-            <div className="mt-8 text-center text-sm text-gray-400">
+            <div className="mt-8 text-center text-sm text-muted-foreground">
               Mostrando {filteredRecipes.length} de {recipes.length} recetas
             </div>
           )}
