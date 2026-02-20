@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Send, Loader2, Utensils, Sparkles } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import { RESTAURANT_GUIDE } from '@/lib/constants';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -101,10 +102,8 @@ export default function RestaurantePage() {
 
               {aiResponse && (
                 <div className="rounded-lg border border-border bg-muted/50 p-4">
-                  <div className="prose prose-invert prose-sm max-w-none">
-                    <div className="text-foreground/80 text-sm whitespace-pre-wrap leading-relaxed">
-                      {aiResponse}
-                    </div>
+                  <div className="prose prose-invert prose-sm max-w-none text-foreground/80">
+                    <ReactMarkdown>{aiResponse}</ReactMarkdown>
                   </div>
                 </div>
               )}
